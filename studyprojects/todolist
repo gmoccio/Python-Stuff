@@ -1,0 +1,54 @@
+class Data:
+    def __init__(self):
+        self.tasklist = []
+        self.complete = []
+
+    def add_task(self, task):
+        self.tasklist.append(task)
+        if self.tasklist == 0:
+            with open("list.txt", "w") as file:
+                file.write(task + "\n")
+        else:
+            with open("list.txt", "a") as file:
+                file.write(task + "\n")
+    
+    def viewtasks(self):
+        with open("list.txt", "r") as file:
+            tasklist = file.readlines()
+        if len(tasklist) == 0:
+            print("There are no tasks to do!")
+            return
+        else:
+            for i, task in enumerate(tasklist):
+                print(f"{i+1}. {task}", end="")
+        return tasklist
+
+    def task_alldone(self): 
+        tasklist = self.viewtasks()
+        if tasklist == None:
+            return
+
+        choice = input("which task are you completed with?: ")
+        index = int(choice) - 1
+        tasklist.pop(index)
+        with open("list.txt", "w") as file:
+            file.writelines(tasklist)
+        print("task removed!")
+        
+    
+tasks = Data()
+
+
+while True:
+    taskadd = input("Type anything to add it to tasklist, view to viewtasks, or done to mark something complete: ")
+    if taskadd == "viewtasks":
+        tasks.viewtasks()
+    elif taskadd == "done":
+        tasks.task_alldone()
+    elif taskadd == "stop":
+        exit()
+    else:
+        tasks.add_task(taskadd)
+        print("added!")
+    
+    
