@@ -43,25 +43,28 @@ class Budget:
         print("math success")
 
     
-    def modify_list(self, uinput):
-        print(f"Here are the contents of {working_budget}: \n")
-        for i in enumerate(working_budget):
-            print(f"{i+1}. {working_budget}", end="")
-        budgets.output()
-        user_input = input("would you like to modify this list or add to it? (modify/add)")
-        if user_input == "modify":
-            budgets.modify_list(user_input)
-            user_input == input("What would you like to remove? ")
-            for i in enumerate(working_budget):
-                if user_input == working_budget[i]:
-                    working.budget.pop(i)
-                    with open(working_budget, "w") as file:
+    def modify_list(self, uinput, wbudg):
+        
+        print(f"Here are the contents of {uinput}: \n")
+        for index, line in enumerate(wbudg):
+            print(f"{index+1}. {line}", end="\n")
+    
+        uinput = input("would you like to modify this list or add to it? (modify/remove): ")
+        if uinput == "modify":
+           pass
+        elif uinput == "remove":
+            input("What would you like to remove?: ")
+            for index, line in enumerate(wbudg):
+                if user_input == line:
+                    wbudg.pop(index)
+                    with open(uinput, "w") as file:
+                        file.writelines(wbudg)
                         print("List updated!")
 
     def view_files(self):
         for file in self.filepath:
-            if file.endswith(".txt")
-        print(file)
+            if file.endswith(".txt"):
+                print(file)
         
 budgets = Budget()
 
@@ -70,8 +73,15 @@ while True:
     if user_input == "create":
         budgets.create_budget(user_input)
     elif user_input == "view":
-        user_input = input(f"Which budget would you like to view?: {budgets.view_files}")
+        budgets.view_files()
+        user_input = input(f"Which budget would you like to view?: ")
         with open(user_input, "r") as file:
             working_budget = file.readlines()
-    else:   
-        budgets.list_append(user_input)
+        budgets.modify_list(user_input, working_budget)
+        
+    #         
+    #     user_input = input("would you like to modify this list?: ")
+    #     if user_input == "yes":
+    #         modify.list(uinput)
+    # else:   
+    #     budgets.list_append(user_input)
