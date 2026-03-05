@@ -44,21 +44,25 @@ class Budget:
 
     
     def modify_list(self, uinput, wbudg):
-        print(f"Here are the contents of {uinput}: \n")
-        for index, line in enumerate(wbudg):
-            print(f"{index+1}. {line}", end="\n")
+        listnum = 0
+        file_map = {}
+        print(f"\nHere are the contents of {uinput}: ")
+        for listnum, line in enumerate(wbudg):
+            listnum += 1
+            print(f"{listnum}. {line}", end="\n")
+            file_map[listnum] = line
     
         uinput = input("would you like to modify this list or add to it? (modify/remove): ")
         if uinput == "modify":
            pass
         elif uinput == "remove":
-            input("What would you like to remove?: ")
-            for index, line in enumerate(wbudg):
-                if user_input == line:
-                    wbudg.pop(index)
-                    with open(uinput, "w") as file:
-                        file.writelines(wbudg)
-                        print("List updated!")
+            print(wbudg)
+            uinput = input("What would you like to remove?: ")
+            if uinput in [line.strip() for line in wbudg]:
+                wbudg.remove(file_map[uinput])
+                with open(uinput, "w") as file:
+                    file.writelines(wbudg)
+                    print("List updated!")
 
     def view_files(self, uinput):
         file_map = {}
@@ -74,10 +78,9 @@ class Budget:
             with open(file_map[uinput], "r") as file:
                 working_budget = file.readlines()
                 self.modify_list(file_map[uinput], working_budget)
-                print("success")
         else:
             print("Invalid Selection")
-        return filenum, working_budget
+        return working_budget
 
 budgets = Budget()
 
