@@ -44,7 +44,6 @@ class Budget:
 
     
     def modify_list(self, uinput, wbudg):
-        
         print(f"Here are the contents of {uinput}: \n")
         for index, line in enumerate(wbudg):
             print(f"{index+1}. {line}", end="\n")
@@ -61,11 +60,25 @@ class Budget:
                         file.writelines(wbudg)
                         print("List updated!")
 
-    def view_files(self):
+    def view_files(self, uinput):
+        file_map = {}
+        filenum = 0
+        working_budget = None
         for file in self.filepath:
             if file.endswith(".txt"):
-                print(file)
-        
+                filenum += 1
+                print(f"{filenum}. {file}")
+                file_map[filenum] = file
+        uinput = int(input(f"Which budget would you like to view?: "))
+        if uinput in file_map:
+            with open(file_map[uinput], "r") as file:
+                working_budget = file.readlines()
+                self.modify_list(file_map[uinput], working_budget)
+                print("success")
+        else:
+            print("Invalid Selection")
+        return filenum, working_budget
+
 budgets = Budget()
 
 while True:
@@ -73,11 +86,8 @@ while True:
     if user_input == "create":
         budgets.create_budget(user_input)
     elif user_input == "view":
-        budgets.view_files()
-        user_input = input(f"Which budget would you like to view?: ")
-        with open(user_input, "r") as file:
-            working_budget = file.readlines()
-        budgets.modify_list(user_input, working_budget)
+        budgets.view_files(user_input)
+        
         
     #         
     #     user_input = input("would you like to modify this list?: ")
