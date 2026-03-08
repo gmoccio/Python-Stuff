@@ -43,24 +43,25 @@ class Budget:
         print("math success")
 
     
-    def modify_list(self, uinput, wbudg):
+    def modify_list(self, uinput, wbudg, file_map):
+        print(file_map)
         listnum = 0
-        file_map = {}
+        item_map = {}
         print(f"\nHere are the contents of {uinput}: ")
-        for listnum, line in enumerate(wbudg):
+        for listnum, line, in enumerate(wbudg):
             listnum += 1
-            print(f"{listnum}. {line}", end="\n")
-            file_map[listnum] = line
+            print(f"{listnum}. {line}")
+            item_map[listnum] = line
     
-        uinput = input("would you like to modify this list or add to it? (modify/remove): ")
-        if uinput == "modify":
+        uinput = input("would you like to add or remove something to this list? (add/remove): ")
+        print(item_map)
+        if uinput == "add":
            pass
         elif uinput == "remove":
-            print(wbudg)
-            uinput = input("What would you like to remove?: ")
-            if uinput in [line.strip() for line in wbudg]:
-                wbudg.remove(file_map[uinput])
-                with open(uinput, "w") as file:
+            uinput = int(input("What would you like to remove?: "))
+            if uinput in item_map:
+                wbudg.remove(item_map[uinput])
+                with open(file_map[1], "w") as file:
                     file.writelines(wbudg)
                     print("List updated!")
 
@@ -77,10 +78,10 @@ class Budget:
         if uinput in file_map:
             with open(file_map[uinput], "r") as file:
                 working_budget = file.readlines()
-                self.modify_list(file_map[uinput], working_budget)
+                self.modify_list(file_map[uinput], working_budget, file_map)
         else:
             print("Invalid Selection")
-        return working_budget
+        return working_budget, file_map
 
 budgets = Budget()
 
