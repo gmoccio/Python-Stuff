@@ -43,7 +43,7 @@ class Budget:
         print("math success")
 
     
-    def modify_list(self, uinput, wbudg, file_map):
+    def modify_list(self, uinput, wbudg, file_map, filename):
         print(file_map)
         listnum = 0
         item_map = {}
@@ -56,29 +56,43 @@ class Budget:
         uinput = input("would you like to add or remove something to this list? (add/remove): ")
         print(item_map)
         if uinput == "add":
-           pass
+            print(filename)
+            while True:
+                uinput = input("Add your purchases, or stop: ")
+                if uinput == "stop":
+                    break
+                with open(filename, "a") as file:
+                    file.write(uinput + "\n")
+                    print("added!")
+                
         elif uinput == "remove":
-            uinput = int(input("What would you like to remove?: "))
-            if uinput in item_map:
-                wbudg.remove(item_map[uinput])
-                with open(file_map[1], "w") as file:
-                    file.writelines(wbudg)
-                    print("List updated!")
+            while True:
+                uinput = input("What would you like to remove, or stop: ")
+                if uinput == "stop":
+                    break
+                uinput = int(uinput)
+                if uinput in item_map:
+                    wbudg.remove(item_map[uinput])
+                    with open(file_map[1], "w") as file:
+                        file.writelines(wbudg)
+                        print("List updated!")
 
     def view_files(self, uinput):
         file_map = {}
         filenum = 0
+        filename = None
         working_budget = None
         for file in self.filepath:
             if file.endswith(".txt"):
                 filenum += 1
                 print(f"{filenum}. {file}")
                 file_map[filenum] = file
-        uinput = int(input(f"Which budget would you like to view?: "))
+        uinput = int(input(f"Which budget would you like to load?: "))
         if uinput in file_map:
+            filename = file_map[uinput]
             with open(file_map[uinput], "r") as file:
                 working_budget = file.readlines()
-                self.modify_list(file_map[uinput], working_budget, file_map)
+                self.modify_list(file_map[uinput], working_budget, file_map, filename)
         else:
             print("Invalid Selection")
         return working_budget, file_map
@@ -86,10 +100,10 @@ class Budget:
 budgets = Budget()
 
 while True:
-    user_input = input("Hello, would you like to create a new budget or view/modify an existing one? (create or view): ")
+    user_input = input("Hello, would you like to create a new budget or load/modify an existing one? (create/load): ")
     if user_input == "create":
         budgets.create_budget(user_input)
-    elif user_input == "view":
+    elif user_input == "load":
         budgets.view_files(user_input)
         
         
