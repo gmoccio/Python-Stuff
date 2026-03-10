@@ -10,7 +10,7 @@ class Budget:
         self.stores = []
         self.receipts = None
         self.total_spent = 0
-        self.budget = float()
+        self.budget = None
         self.filepath = os.listdir("/home/gordon/projects/pythonstuff/grocerybudget")
         self.files = self.filepath
 
@@ -43,9 +43,12 @@ class Budget:
         if uinput in file_map:
             filename = file_map[uinput]
             with open(file_map[uinput], "r") as file:
-                self.receipts = file.readlines()
-            self.math()
-            self.modify_list(file_map[uinput], file_map, filename)       
+                lines = file.readlines()
+                result = next((line.replace("BUDGET: ", "").strip() for line in lines if line.startswith("BUDGET: ")), None)
+                self.budget = float(result) if result is not None else 0.0
+                self.receipts = [line for line in lines if not line.startswith("BUDGET: ")]
+                self.math()
+                self.modify_list(file_map[uinput], file_map, filename)       
         else:
             print("Invalid Selection")
         return file_map
@@ -53,6 +56,7 @@ class Budget:
 
     def math(self):
         print(self.receipts)
+        print(self.budget)
         self.receipts
         for i in self.receipts:
             store, price = i.strip().split()
@@ -99,9 +103,11 @@ class Budget:
                         file.writelines(self.receipts)
                         print("List updated!")
 
+
 budgets = Budget()
 
 while True:
+    budgets.__init__()
     user_input = input("Hello, would you like to create a new budget or load/modify an existing one? (create/load): ")
     if user_input == "create":
         budgets.create_budget(user_input)
