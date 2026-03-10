@@ -24,7 +24,7 @@ class Budget:
         else:
             uinput = input("what is the budget you want to set for this month?: ")
             with open(filename, "w") as file:
-                file.write(f"BUDGET: {uinput}")
+                file.write(f"BUDGET: {uinput} \n")
             print("File created!")
     
    
@@ -55,51 +55,77 @@ class Budget:
 
 
     def math(self):
-        print(self.receipts)
-        print(self.budget)
-        self.receipts
+        self.total_spent = 0
+        self.stores = []
         for i in self.receipts:
-            store, price = i.strip().split()
+            store, price = i.strip().rsplit(" ", 1)
             self.stores.append(store)
             self.total_spent += float(price)
-        print(self.stores)
-        print(self.total_spent)
 
 
 
     def modify_list(self, uinput, file_map, filename):
         listnum = 0
         item_map = {}
-        print(f"\nHere are the contents of {uinput}: ")
-        for listnum, line, in enumerate(self.receipts):
-            if line is None:
-                print("Nothing in budget!")
+        for listnum, line in enumerate(self.receipts):
             listnum += 1
             print(f"{listnum}. {line}")
-            item_map[listnum] = line
-    
+            item_map[listnum] = line    
         uinput = input("would you like to add or remove something to this list? (add/remove): ")
         if uinput == "add":
             print(filename)
             while True:
                 uinput = input("Add your purchases, or stop: ")
                 if uinput == "stop":
+                    with open(filename, "a") as file:
+                        file.write(f"TOTAL SPENT: {self.total_spent} \n")
+                        if self.budget - self.total_spent > 100:
+                            file.write(f"You are in Budget this month by {self.budget - self.total_spent}!")
+                        elif abs(self.budget - self.total_spent) <= 100:
+                            file.write(f"you are close to budget by {self.budget - self.total_spent}")
+                        elif self.total_spent > self.budget:
+                            file.write(f"You are over budget by {self.total_spent - self.budget}!")       
                     break
                 with open(filename, "a") as file:
                     file.write(uinput + "\n")
                     print("added!")
                     self.receipts.append(uinput)
+                    print(f"before math: {self.receipts}")
                     self.math()
-                
+                    for listnum, line in enumerate(self.receipts):
+                        if line.startswith(("BUDGET: ", "TOTAL SPENT: ", "you have", "You are")):
+                            continue
+                        listnum += 1
+                        print(f"{listnum}. {line}")
+                        item_map[listnum] = line
+                    print(f"Total Spent: {self.total_spent}")
+                    print(f"Total Budget: {self.budget}")
+                    if self.budget - self.total_spent > 100:
+                        print(f"You have {self.budget - self.total_spent} remaining!")
+                    elif abs(self.budget - self.total_spent) <= 100:
+                        print(f"You have {self.budget - self.total_spent} remaining!")
+                        print("You are close to budget!")
+                    elif self.total_spent > self.budget:
+                        print(f"You are over budget by {self.total_spent - self.budget}!")      
         elif uinput == "remove":
             while True:
+                listnum = 0
+                item_map = {}
+                for line in self.receipts:
+                    print(f"line: {repr(line)}")
+                    if line.startswith(("BUDGET: ", "TOTAL SPENT: ", "you have", "You are")):
+                        continue
+                    listnum += 1
+                    print(f"{listnum}. {line}")
+                    item_map[listnum] = line
                 uinput = input("What would you like to remove, or stop: ")
                 if uinput == "stop":
                     break
                 uinput = int(uinput)
                 if uinput in item_map:
                     self.receipts.remove(item_map[uinput])
-                    with open(file_map[1], "w") as file:
+                    with open(filename, "w") as file:
+                        file.writelines(f"BUDGET: {self.budget} \n")
                         file.writelines(self.receipts)
                         print("List updated!")
 
