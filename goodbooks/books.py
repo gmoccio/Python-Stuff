@@ -50,3 +50,20 @@ def search_menu(user_id):
         database.append_reading_list(user_id, book)
         print("Book added!")
         main.main_menu(user_id)
+    
+def leave_review(user_id):
+    rows = database.parse_readlist(user_id)
+
+    if not rows:
+        print("No books in reading list!")
+        return
+
+    for i, row in enumerate(rows, start=1):
+        print(f"{i}. {row[0]}")
+
+    uinput = int(input("Which book would you like to review? (enter number): "))
+    book_title = rows[uinput - 1][0]
+    stars = input("How many stars would you leave this book (1-5)?: ")
+    review = input("Write your review: ")
+    database.append_review_list(user_id, book_title, stars, review)
+    print("Review Added!")
