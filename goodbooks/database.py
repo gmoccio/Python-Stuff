@@ -80,3 +80,13 @@ def append_review_list(user_id, book_title, stars, review):
     database, cursor = get_connection()
     cursor.execute("INSERT INTO reviews (user_id, book_title, stars, review_text) VALUES (?, ?, ?, ?)", (user_id, book_title, stars, review))
     database.commit()
+
+def read_reviews(view_reviews):
+    database, cursor = get_connection()
+    cursor.execute("""
+                    SELECT users.username, reviews.stars, reviews.review_text
+                    FROM reviews 
+                    JOIN users ON reviews.user_id = users.id
+                    WHERE reviews.book_title = ?
+                    """, (view_reviews,))
+    return cursor.fetchall()
