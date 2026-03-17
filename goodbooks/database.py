@@ -70,4 +70,13 @@ def view_readlist(user_id):
         print(f"    Author:     {row[1]}")
         print(f"    Pages:      {row[2]}")
         print(f"    Published:  {row[3]}")
-    
+
+def parse_readlist(user_id):
+    database, cursor = get_connection()
+    cursor.execute("SELECT book_title, book_author, book_length, publish_date FROM reading_list WHERE user_id = ?", (user_id,))
+    return cursor.fetchall()
+
+def append_review_list(user_id, book_title, stars, review):
+    database, cursor = get_connection()
+    cursor.execute("INSERT INTO reviews (user_id, book_title, stars, review_text) VALUES (?, ?, ?, ?)", (user_id, book_title, stars, review))
+    database.commit()
