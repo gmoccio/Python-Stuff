@@ -45,12 +45,34 @@ def search_menu(user_id):
     print(f"    Pages: {book['pages']}")
     print(f"    Published: {book['published']}")
 
-    uinput = input("Add to reading list? (yes/no): ")
-    if uinput == "yes":
+    print("\n1. Add to reading list")
+    print("2. Read reviews")
+    print("3. Exit")
+    uinput = input("Enter number for selection: ")
+    if uinput == "1":
         database.append_reading_list(user_id, book)
         print("Book added!")
-        main.main_menu(user_id)
-    
+        return
+    elif uinput == "2":
+        view_reviews = book['title']
+        pull_reviews(view_reviews)
+    elif uinput == "3":
+        return
+
+
+
+def pull_reviews(view_reviews):
+    rows = database.read_reviews(view_reviews)
+    if not rows:
+        print("No reviews for this book yet!")
+        return
+
+    for row in rows:
+        print(f"{row[0]} gave it {row[1]} stars")
+        print(row[2])
+
+
+
 def leave_review(user_id):
     rows = database.parse_readlist(user_id)
 
