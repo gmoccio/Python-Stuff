@@ -13,7 +13,11 @@ def create_tables():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT,
-            password TEXT
+            password TEXT,
+            bio TEXT,
+            preferred_genres TEXT,
+            liked_books TEXT,
+            disliked_books TEXT
             )
         """)
 
@@ -42,9 +46,9 @@ def create_tables():
 
     database.commit()
 
-def insert_user(username, hashedpw):
+def insert_user(username, hashedpw, bio, pref_genres):
     database, cursor = get_connection()
-    cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashedpw))
+    cursor.execute("INSERT INTO users (username, password, bio, preferred_genres) VALUES (?, ?, ?, ?)", (username, hashedpw, bio, pref_genres))
     database.commit()
 
 def login_user(username, password):
@@ -90,3 +94,8 @@ def read_reviews(view_reviews):
                     WHERE reviews.book_title = ?
                     """, (view_reviews,))
     return cursor.fetchall()
+
+def view_profiles(username):
+    database, cursor = get_connection()
+    cursor.execute("SELECT id, username, bio, preferred_genres FROM users WHERE username = ?", (username,))
+    return cursor.fetchone()
