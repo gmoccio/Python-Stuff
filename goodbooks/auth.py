@@ -9,7 +9,9 @@ def login():
             username = input("Create username: ")
             password = getpass.getpass("Create password: " )
             hashedpw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-            database.insert_user(username, hashedpw)
+            bio = input("Write a bio to describe yourself: ")
+            pref_genres = input("What are your preferred genres?: ")
+            database.insert_user(username, hashedpw, bio, pref_genres)
             print("Profile Created!")
         elif uinput == "login":
             username = input("Enter your username: ")
