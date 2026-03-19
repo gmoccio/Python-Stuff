@@ -10,7 +10,7 @@ def main():
 
 def main_menu(user_id):
     while True:
-        print("What would you like to do?: ")
+        print("\nWhat would you like to do?: ")
         print("1. Search books")
         print("2. View reading list")
         print("3. Review read books")
