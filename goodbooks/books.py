@@ -67,10 +67,17 @@ def pull_reviews(view_reviews):
         print("No reviews for this book yet!")
         return
 
-    for row in rows:
-        print(f"{row[0]} gave it {row[1]} stars")
+    for i, row in enumerate(rows, start=1):
+        print(f"{i} {row[0]} gave it {row[1]} stars")
         print(row[2])
 
+    uinput = input("Would you like to view a profile? (yes/no): ")
+    if uinput == "yes": 
+        uinput = int(input("Which profile? (Select a number): "))
+        username = rows[uinput - 1][0]
+        profiles(username)
+    elif uinput == "no":
+        return
 
 
 def leave_review(user_id):
@@ -89,3 +96,17 @@ def leave_review(user_id):
     review = input("Write your review: ")
     database.append_review_list(user_id, book_title, stars, review)
     print("Review Added!")
+
+def profiles(username):
+    profile = database.view_profiles(username)
+
+    if not profile:
+        print("User not found!")
+        return
+    
+    user_id = profile[0]
+
+    print(f"{profile[1]}'s Profile: ")
+    print(f"Bio: {profile[2]}")
+    print(f"Preferred Genre(s): {profile[3]}")
+
