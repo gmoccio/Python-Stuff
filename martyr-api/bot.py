@@ -47,8 +47,15 @@ async def today(ctx):
 @bot.command()
 async def schedule(ctx, time: str):
     global CHANNEL_ID, SCHEDULED_TIME
-    if ":" not in time:
-        time = time[:2] + ":" + time[2:]
+    try:
+        if ":" not in time:
+            time = time[:2] + ":" + time[2:]
+        hours, minutes = time.split(":")
+        if not (0 <= int(hours) <= 23 and 0 <= int(minutes) <= 59):
+            raise ValueError
+    except ValueError:
+        await ctx.send("Invalid time format. Please use HH:MM in 24-hour format.")
+        return
     if daily_post.is_running(): #since daily_post is a loop, it has to be checked if its running before scheduling a time.
         await ctx.send(f"The Martyrology is scheduled to post daily at {SCHEDULED_TIME}. Use !martyr reschedule to change the time or !martyr unschedule to stop daily posts.")
     else:
@@ -71,8 +78,15 @@ async def date(ctx, time: str): #time (which is the date in this context, as a v
 @bot.command()
 async def reschedule(ctx, time: str):
     global CHANNEL_ID, SCHEDULED_TIME
-    if ":" not in time:
-        time = time[:2] + ":" + time[2:]
+    try:
+        if ":" not in time:
+            time = time[:2] + ":" + time[2:]
+        hours, minutes = time.split(":")
+        if not (0 <= int(hours) <= 23 and 0 <= int(minutes) <= 59):
+            raise ValueError
+    except ValueError:
+        await ctx.send("Invalid time format. Please use HH:MM in 24-hour format.")
+        return
     if daily_post.is_running():
         daily_post.cancel()
         await asyncio.sleep(2)
