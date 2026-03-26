@@ -5,15 +5,19 @@ from datetime import datetime
 import asyncio
 from dotenv import load_dotenv
 import os
+import pytz
+
 
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 
+
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix = '!martyr ', intents=intents)
+bot = commands.Bot(command_prefix = '!martyr ', intents=intents, help_command=None)
 
+EST = pytz.timezone('US/Eastern')
 CHANNEL_ID = None
 SCHEDULED_TIME = None
 LAST_POST_DATE = None
@@ -35,29 +39,44 @@ async def on_ready():
 @bot.command()
 async def today(ctx):
     global CHANNEL_ID, SCHEDULED_TIME
-    today = datetime.now()
+    today = datetime.now(EST)
     text = get_martyrology(today.month, today.day)
     await ctx.send(text)
-    await ctx.send("Precious in the sight of the Lord, is the death of his saints.")
+    await ctx.send("\n\nPrecious in the sight of the Lord, is the death of his saints.")
 
 @bot.command()
 async def schedule(ctx, time: str):
     global CHANNEL_ID, SCHEDULED_TIME
-    CHANNEL_ID = ctx.channel.id
-    SCHEDULED_TIME = time
-    await ctx.send(f"Daily Martyrology posts scheduled for {SCHEDULED_TIME}")
-    daily_post.start()
+    if daily_post.is_running():
+        await ctx.send(f"The Martyrology is scheduled to post daily at {SCHEDULED_TIME}. Use !martyr reschedule to change the time or !martyr unschedule to stop daily posts.")
+    else:
+        CHANNEL_ID = ctx.channel.id
+        SCHEDULED_TIME = time
+        await ctx.send(f"Daily Martyrology posts scheduled for {SCHEDULED_TIME}")
+        daily_post.start()
 
 @bot.command()
 async def date(ctx, time: str):
     try:
         month, day = map(int, time.split('-'))
-        await ctx.send(f"Here is the martyrology for {month}/{day}")
+        await ctx.send(f"Here is the martyrology for {month}/{day}\n")
         text = get_martyrology(month, day)
         await ctx.send(text)
-        await ctx.send("Precious in the sight of the Lord, is the death of his saints.")
+        await ctx.send("\n\nPrecious in the sight of the Lord, is the death of his saints.")
     except ValueError:
         await ctx.send("Invalid date format. Please use MM-DD.")
+
+@bot.command()
+async def reschedule(ctx, time: str):
+    global CHANNEL_ID, SCHEDULED_TIME
+    if daily_post.is_running():
+        daily_post.cancel()
+        daily_post.stop()
+        await asyncio.sleep(2)
+    CHANNEL_ID = ctx.channel.id
+    SCHEDULED_TIME = time
+    await ctx.send(f"Daily Martyrology posts rescheduled for {SCHEDULED_TIME}")
+    daily_post.start()
 
 @bot.command()
 async def unschedule(ctx):
@@ -70,16 +89,29 @@ async def unschedule(ctx):
     else:
         await ctx.send("No daily post time is scheduled.")
 
+@bot.command()
+async def help(ctx):
+    help_text = """
+**!martyr today** - Get today's martyrology.
+**!martyr date MM-DD** - Get martyrology for a specific date.
+**!martyr schedule HH:MM** - Schedule daily posts at a specific time (24-hour format).
+**!martyr reschedule HH:MM** - Change the scheduled time for daily posts.
+**!martyr unschedule** - Stop daily posts.
+    """
+    await ctx.send(help_text)
+
 @tasks.loop(minutes=1)
 async def daily_post():
     global LAST_POST_DATE
-    now = datetime.now().strftime("%H:%M")
-    today = datetime.now().date()
+    now = datetime.now(EST).strftime("%H:%M")
+    today = datetime.now(EST).date()
     if now == SCHEDULED_TIME and LAST_POST_DATE != today:
         LAST_POST_DATE = today
         channel = bot.get_channel(CHANNEL_ID)
-        today = datetime.now()
+        today = datetime.now(EST)
         text = get_martyrology(today.month, today.day)
+        await channel.send(f"Here is the martyrology for today, {today.month}/{today.day}:\n")
         await channel.send(text)
+        await channel.send("\n\nPrecious in the sight of the Lord, is the death of his saints.")
 
 bot.run(token)
